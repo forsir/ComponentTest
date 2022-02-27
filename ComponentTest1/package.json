@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "name": "mypackage",
+  "private": true,
+  "devDependencies": {
+    "gulp": "4.0.2",
+    "gulp-concat": "2.6.1",
+    "del": "5.1.0"
+  },
+  "dependencies": {
+    "mustache": "4.2.0"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "amd-loader": "^0.0.8",
+    "del": "^6.0.0",
+    "gulp": "^4.0.2",
+    "gulp-concat": "^2.6.1",
+    "mustache": "^4.2.0"
+  }
+}
