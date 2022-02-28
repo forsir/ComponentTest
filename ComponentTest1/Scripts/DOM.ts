@@ -126,7 +126,7 @@ export class DOM {
 
         const component = new c();
         component.mount($element);
-        parent.addChild(component);
+        parent.addChild($element.id, component);
         return component;
     }
 

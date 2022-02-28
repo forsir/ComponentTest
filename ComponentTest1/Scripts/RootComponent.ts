@@ -1,21 +1,40 @@
-import { DOM } from "./DOM";
+import { render } from "mustache";
 import { Component, ComponentOptions } from "./Component";
-import { Logger } from "./Logger";
-import { PageComponentProps } from "./PageComponent";
-//import { MessageDialogComponent, MessageDialogProps } from "./components/messagedialog/MessageDialogComponent";
-
-//DOM.define("message-dialog", MessageDialogComponent);
+import { PageComponent, PageComponentProps } from "./PageComponent";
 
 export interface RootComponentProps extends ComponentOptions {
     page: PageComponentProps
 }
 
 export class RootComponent extends Component {
-    static root: RootComponent;
+    public static root: RootComponent;
 
-    constructor(opts: ComponentOptions = {}) {
-        //RootComponent.root = this;
+    constructor(props: PageComponentProps) {
+        super(props);
 
-        super(opts);
+        RootComponent.root = this;
+
+        this.addChild('page', new PageComponent(props));
+    }
+
+    getTemplate() {
+        return "{{page}}";
+    }
+
+    public getRenderedContent(): string {
+        const template = this.getTemplate();
+
+        this.markDirty(false);
+        if (template) {
+            var partials;
+            var renderedState = <{ [key: string]: any }>{ ...this.state, ...this.getRenderedChildren() };
+
+            for (let key in this.children) {
+                let child = this.children[key];
+                renderedState[key] = child.getRenderedContent();
+            }
+
+            return render(template, renderedState, partials);
+        }
     }
 }

@@ -5,13 +5,13 @@
     "removeComments": true,
     "sourceMap": true,
     "module": "CommonJS",
-    //"module": "AMD",
-    "moduleResolution": "Node",
+    //"module": "UMD",
+    //"moduleResolution": "Node",
     "allowJs": false,
-    "lib": [ "ES5", "DOM" ],
-    "target": "ES3",
+    "lib": [ "ES2015", "DOM" ],
+    "target": "ES3"
     //"outFile": "../wwwroot/scripts/app1.js"
-    "outDir": "dist"
+    //"outDir": "dist"
   },
   "include": [ "./**/*" ],
   "compileOnSave": true

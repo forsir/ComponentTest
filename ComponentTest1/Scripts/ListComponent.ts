@@ -8,23 +8,22 @@ export interface ListComponentProps extends ComponentOptions {
 export class ListComponent extends Component {
     protected props: ListComponentProps;
 
-    items: Component[]
-
-    constructor(opts: ListComponentProps) {
-        super(opts);
-        this.items = opts.items.map((item) => new TextItemComponent(item));
+    constructor(props: ListComponentProps) {
+        super(props);
+        for (var i = 0; i < props.items.length; i++) {
+            this.addChild(null, new TextItemComponent(props.items[i]));
+        }
     }
 
-    //public getRenderedChildren() {
-    //    return {
-    //        itemComponents:
-    //            this.items.map((item)=> item.)
-    //    }
-    //}
+    public getRenderedChildren() {
+        return {
+            children: this.getChildren()
+        }
+    }
 
     public getTemplate(): string {
-        return `{{#itemComponents}}
+        return `{{#children}}
                 * {{getRenderedContent}}
-                {{/items}}`;
+                {{/children}}`;
     }
 }

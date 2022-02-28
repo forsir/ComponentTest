@@ -57,6 +57,8 @@ export interface ComponentInterface {
 
     getId(): string;
 
+    setId(id: string | undefined): void;
+
     setParent(parent: ComponentInterface): void;
 
     getParent(): ComponentInterface;
@@ -75,7 +77,7 @@ export interface ComponentInterface {
 
     hasElement(): boolean;
 
-    addChild(component: ComponentInterface): void;
+    addChild(id: string | undefined, child: ComponentInterface): void;
 
     deleteChild(idx: number): void;
 
@@ -92,17 +94,20 @@ export interface ComponentInterface {
     walk(callback: Function): void;
 
     getRenderedChildren(): {};
+
+    getRenderedContent(): string;
 }
 
 export interface ComponentOptions {
-    state?: {}
+    id?: string;
+    state?: {};
 }
 
 export abstract class Component implements ComponentInterface, EventListener {
     protected parent: ComponentInterface;
     protected children: { [id: string]: ComponentInterface } = {};
     protected cid: string;
-    private state: object = {};
+    protected state: object = {};
     private $element: HTMLElement;
     private _isDirty: boolean = true;
     private _eventResolver: EventsListener;
@@ -114,15 +119,17 @@ export abstract class Component implements ComponentInterface, EventListener {
             this.setState(opts.state);
         }
 
+        this.cid = opts.id || "mqC-" + ++__uid;
+
         this.onCreated();
     }
 
     public getId(): string {
-        if (!this.cid) {
-            this.cid = "mqC-" + ++__uid;
-        }
-
         return this.cid;
+    }
+
+    public setId(id: string | undefined): void {
+        this.cid = id || this.cid;
     }
 
     public setParent(parent: ComponentInterface) {
@@ -175,15 +182,20 @@ export abstract class Component implements ComponentInterface, EventListener {
     }
 
     public getElement(): HTMLElement {
-        return this.$element || document.getElementById(this.getId());
+        if (!this.hasElement()) {
+            this.$element = document.getElementById(this.getId());
+        }
+
+        return this.$element;
     }
 
     public hasElement() {
         return !!this.$element;
     }
 
-    public addChild(child: ComponentInterface) {
+    public addChild(id: string | undefined, child: ComponentInterface) {
         child.setParent(this);
+        child.setId(id);
         this.children[child.getId()] = child;
     }
 
@@ -380,34 +392,36 @@ export abstract class Component implements ComponentInterface, EventListener {
         return location.hash.replace('#/', '');
     }
 
-    public getRenderedChildren() {
+    public getRenderedChildren(): { [key: string]: any } {
         return {};
     }
 
-    public getRenderedContent() {
+    public getRenderedContent(): string {
         const template = this.getTemplate();
 
         this.markDirty(false);
         if (template) {
             var partials;
-            var state = { ...this.state, ...this.getRenderedChildren() }
-            return '<div id="' + this.getId() + '">' + render(template, state, partials) + '</div>';
+            var renderedState = <{ [key: string]: any }>{ ...this.state, ...this.getRenderedChildren() };
+
+            for (let key in this.children) {
+                let child = this.children[key];
+                renderedState[key] = child.getRenderedContent();
+            }
+
+            return '<div id="' + this.getId() + '">' + render(template, renderedState, partials) + '</div>';
         }
     }
 
     private _render() {
         this.markDirty(false);
 
-        const template = this.getTemplate();
+        const rendered = this.getRenderedContent();
 
-        if (template) {
-            const rendered = this.getRenderedContent();
-
-            let element = document.getElementById(this.getId());
-            if (element) {
-                if (element.innerHTML !== rendered) {
-                    element.innerHTML = rendered;
-                }
+        let element = this.getElement();
+        if (element) {
+            if (element.innerHTML !== rendered) {
+                element.innerHTML = rendered;
             }
         }
     }

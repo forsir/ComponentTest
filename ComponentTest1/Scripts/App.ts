@@ -1,14 +1,22 @@
-﻿import { RootComponent } from "./RootComponent";
+﻿import { ComponentOptions } from "./Component";
+import { Dictionary } from "./Dictionary";
+import { RootComponent } from "./RootComponent";
+
+declare global {
+    interface Window {
+        vocabulary: any;
+        globalState: any;
+        resolution: string;
+        onInputChange(input: HTMLInputElement): void;
+    }
+}
 
 window.addEventListener('load', (event) => {
-    var rootElement = document.getElementById("app");
-    rootElement.innerHTML = "inner element: <div id='inner'>Jedna</div> konec";
-    var rootElement1 = document.getElementById("inner");
-    rootElement1.innerHTML = "Dva";
-    rootElement.innerHTML = "inner element změna: <div id='inner'>Jedna</div> konec";
-    rootElement1.innerHTML = "Tři";
+    console.log("app start");
 
-    var rootComponent = new RootComponent();
+    Dictionary.setVocabulary(window.vocabulary || {});
+
+    var rootComponent = new RootComponent(window.globalState);
     var rootElement = document.getElementById("app");
     rootComponent.setElement(rootElement);
     rootComponent.render();

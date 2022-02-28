@@ -1,18 +1,13 @@
 const path = require('path');
 
 module.exports = {
+    devtool: "source-map",
     entry: {
-        home: './Scripts/Pages/Home',
-        about: './Scripts/Pages/About'
+        home: './Scripts/app.ts',
     },
     mode: 'production',
     optimization: {
-        minimize: true,
-        splitChunks: {
-            chunks: 'all',
-            minSize: 0,
-            name: 'shared'
-        }
+        minimize: false,
     },
     module: {
         rules: [
@@ -27,11 +22,7 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js']
     },
     output: {
-        filename: '[name].js',
-        path: path.resolve(__dirname, 'wwwroot/js'),
-        library: 'sample',
-        libraryTarget: 'umd'
+        filename: 'app.js',
+        path: path.resolve(__dirname, '/wwwroot/scripts')
     }
 };
-
-

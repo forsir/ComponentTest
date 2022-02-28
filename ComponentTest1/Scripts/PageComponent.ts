@@ -10,20 +10,10 @@ export interface PageComponentProps extends ComponentOptions {
 export class PageComponent extends Component {
     protected props: HeaderComponentProps;
 
-    header: HeaderComponent
-    list: ListComponent
-
     constructor(opts: PageComponentProps) {
         super(opts);
-        this.header = new HeaderComponent(opts.header);
-        this.list = new ListComponent(opts.list);
-    }
-
-    public getRenderedChildren() {
-        return {
-            header: this.header.getRenderedContent(),
-            list: this.list.getRenderedContent()
-        }
+        this.addChild('header', new HeaderComponent(opts.header));
+        this.addChild('list', new ListComponent(opts.list));
     }
 
     public getTemplate(): string {
