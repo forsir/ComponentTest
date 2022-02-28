@@ -2,12 +2,23 @@
   "version": "1.0.0",
   "name": "mypackage",
   "private": true,
+  "main": "app.js",
   "devDependencies": {
     "gulp": "4.0.2",
     "gulp-concat": "2.6.1",
-    "del": "5.1.0"
+    "del": "5.1.0",
+    "ts-loader": "^5.3.1",
+    "typescript": "^3.2.1",
+    "webpack": "^4.26.1",
+    "webpack-cli": "^3.1.2"
   },
   "dependencies": {
+    "@types/mustache": "4.1.2",
     "mustache": "4.2.0"
+  },
+  "-vs-binding": {
+    "BeforeBuild": [
+      "build:webpack"
+    ]
   }
 }

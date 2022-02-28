@@ -4,13 +4,14 @@
     "noImplicitAny": true,
     "removeComments": true,
     "sourceMap": true,
-    //"module": "CommonJS",
-    "module": "AMD",
+    "module": "CommonJS",
+    //"module": "AMD",
     "moduleResolution": "Node",
     "allowJs": false,
-    "lib": [ "ES2015", "DOM" ],
+    "lib": [ "ES5", "DOM" ],
     "target": "ES3",
-    "outFile": "../wwwroot/scripts/app1.js"
+    //"outFile": "../wwwroot/scripts/app1.js"
+    "outDir": "dist"
   },
   "include": [ "./**/*" ],
   "compileOnSave": true
