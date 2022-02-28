@@ -1,4 +1,4 @@
-﻿import W from "./Dictionary";
+﻿import W from "../Common/Dictionary";
 import { MessageDialogButtonProps } from "./MessageDialogButtonComponent";
 import { MessageDialogComponent, MessageDialogProps } from "./MessageDialogComponent";
 

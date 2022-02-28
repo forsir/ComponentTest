@@ -146,16 +146,16 @@ var EvtSource = (function () {
 }());
 exports.EvtSource = EvtSource;
 var Component = (function () {
-    function Component(opts) {
-        if (opts === void 0) { opts = {}; }
+    function Component(props) {
+        if (props === void 0) { props = {}; }
         this.children = {};
         this.state = {};
         this._isDirty = true;
         this.eventSrc = new EvtSource();
-        if (opts.state) {
-            this.setState(opts.state);
+        if (props.state) {
+            this.setState(props.state);
         }
-        this.cid = opts.id || "mqC-" + ++__uid;
+        this.cid = props.id || "mqC-" + ++__uid;
         this.onCreated();
     }
     Component.prototype.getId = function () {
@@ -361,13 +361,12 @@ var Component = (function () {
         var template = this.getTemplate();
         this.markDirty(false);
         if (template) {
-            var partials;
-            var renderedState = __assign(__assign({}, this.state), this.getRenderedChildren());
+            var partials = __assign({}, this.getRenderedChildren());
             for (var key in this.children) {
                 var child = this.children[key];
-                renderedState[key] = child.getRenderedContent();
+                partials[key] = child.getRenderedContent();
             }
-            return '<div id="' + this.getId() + '">' + mustache_1.render(template, renderedState, partials) + '</div>';
+            return '<div id="' + this.getId() + '">' + mustache_1.render(template, this.state, partials) + '</div>';
         }
     };
     Component.prototype._render = function () {
@@ -429,19 +428,18 @@ var RootComponent = (function (_super) {
         return _this;
     }
     RootComponent.prototype.getTemplate = function () {
-        return "{{page}}";
+        return "{{>page}}";
     };
     RootComponent.prototype.getRenderedContent = function () {
         var template = this.getTemplate();
         this.markDirty(false);
         if (template) {
-            var partials;
-            var renderedState = __assign(__assign({}, this.state), this.getRenderedChildren());
+            var partials = __assign({}, this.getRenderedChildren());
             for (var key in this.children) {
                 var child = this.children[key];
-                renderedState[key] = child.getRenderedContent();
+                partials[key] = child.getRenderedContent();
             }
-            return mustache_1.render(template, renderedState, partials);
+            return mustache_1.render(template, this.state, partials);
         }
     };
     return RootComponent;
@@ -1572,7 +1570,7 @@ var PageComponent = (function (_super) {
         return _this;
     }
     PageComponent.prototype.getTemplate = function () {
-        return "<div>{{header}}</div>\n                <div>{{list}}</div>";
+        return "<div>{{>header}}</div>\n                <div>{{>list}}</div>";
     };
     return PageComponent;
 }(Component_1.Component));
@@ -1647,12 +1645,13 @@ var ListComponent = (function (_super) {
         return _this;
     }
     ListComponent.prototype.getRenderedChildren = function () {
+        console.log({ children: this.getChildren() });
         return {
             children: this.getChildren()
         };
     };
     ListComponent.prototype.getTemplate = function () {
-        return "{{#children}}\n                * {{getRenderedContent}}\n                {{/children}}";
+        return "{{#children}}\n                * {{>getRenderedContent}}\n                {{/children}}";
     };
     return ListComponent;
 }(Component_1.Component));

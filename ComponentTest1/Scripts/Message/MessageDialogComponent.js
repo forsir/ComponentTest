@@ -16,7 +16,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 exports.MessageDialogComponent = void 0;
-var Component_1 = require("./Component");
+var Component_1 = require("../Component");
 var MessageDialogComponent = (function (_super) {
     __extends(MessageDialogComponent, _super);
     function MessageDialogComponent() {

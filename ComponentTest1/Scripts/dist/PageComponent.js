@@ -28,7 +28,7 @@ var PageComponent = (function (_super) {
         return _this;
     }
     PageComponent.prototype.getTemplate = function () {
-        return "<div>{{header}}</div>\n                <div>{{list}}</div>";
+        return "<div>{{>header}}</div>\n                <div>{{>list}}</div>";
     };
     return PageComponent;
 }(Component_1.Component));

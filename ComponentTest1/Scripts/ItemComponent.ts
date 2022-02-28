@@ -1,6 +1,6 @@
-﻿import { Component, ComponentOptions } from "./Component";
+﻿import { Component, ComponentProps } from "./Component";
 
-export interface ItemComponentProps extends ComponentOptions {
+export interface ItemComponentProps extends ComponentProps {
 }
 
 export class ItemComponent extends Component {

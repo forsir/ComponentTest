@@ -39,19 +39,18 @@ var RootComponent = (function (_super) {
         return _this;
     }
     RootComponent.prototype.getTemplate = function () {
-        return "{{page}}";
+        return "{{>page}}";
     };
     RootComponent.prototype.getRenderedContent = function () {
         var template = this.getTemplate();
         this.markDirty(false);
         if (template) {
-            var partials;
-            var renderedState = __assign(__assign({}, this.state), this.getRenderedChildren());
+            var partials = __assign({}, this.getRenderedChildren());
             for (var key in this.children) {
                 var child = this.children[key];
-                renderedState[key] = child.getRenderedContent();
+                partials[key] = child.getRenderedContent();
             }
-            return (0, mustache_1.render)(template, renderedState, partials);
+            return (0, mustache_1.render)(template, this.state, partials);
         }
     };
     return RootComponent;

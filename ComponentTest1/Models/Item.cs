@@ -2,6 +2,11 @@
 {
     public class Item
     {
-        public string Description { get; set; }
+        public object State { get; set; }
+
+        public Item(string text)
+        {
+            State = new { Description = text };
+        }
     }
 }

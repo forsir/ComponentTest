@@ -28,12 +28,13 @@ var ListComponent = (function (_super) {
         return _this;
     }
     ListComponent.prototype.getRenderedChildren = function () {
+        console.log({ children: this.getChildren() });
         return {
             children: this.getChildren()
         };
     };
     ListComponent.prototype.getTemplate = function () {
-        return "{{#children}}\n                * {{getRenderedContent}}\n                {{/children}}";
+        return "{{#children}}\n                * {{>getRenderedContent}}\n                {{/children}}";
     };
     return ListComponent;
 }(Component_1.Component));

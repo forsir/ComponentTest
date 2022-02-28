@@ -1,4 +1,4 @@
-import { ComponentInterface } from "./Component";
+import { ComponentInterface } from "../Component";
 
 let items: ComponentInterface[] = [];
 

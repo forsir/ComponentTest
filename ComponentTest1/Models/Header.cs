@@ -2,6 +2,11 @@
 {
     public class Header
     {
-        public string Title { get; set; }
+        public object State { get; set; }
+
+        public Header(string text)
+        {
+            State = new { title = text };
+        }
     }
 }

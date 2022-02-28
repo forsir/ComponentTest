@@ -1,5 +1,5 @@
 import { Logger } from "./Logger";
-import { ComponentInterface } from "./Component";
+import { ComponentInterface } from "../Component";
 
 export class EventsListener implements EventListenerObject {
     events: { [index: string]: any } = {};

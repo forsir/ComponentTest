@@ -2,6 +2,9 @@
 {
     public class TextItem : Item
     {
-        public string Value { get; set; }
+        public TextItem(string description, string value) : base(description)
+        {
+            State = new { Description = description, Value = value };
+        }
     }
 }

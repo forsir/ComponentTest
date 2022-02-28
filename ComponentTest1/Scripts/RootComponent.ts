@@ -1,8 +1,8 @@
 import { render } from "mustache";
-import { Component, ComponentOptions } from "./Component";
+import { Component, ComponentProps } from "./Component";
 import { PageComponent, PageComponentProps } from "./PageComponent";
 
-export interface RootComponentProps extends ComponentOptions {
+export interface RootComponentProps extends ComponentProps {
     page: PageComponentProps
 }
 
@@ -18,7 +18,7 @@ export class RootComponent extends Component {
     }
 
     getTemplate() {
-        return "{{page}}";
+        return "{{>page}}";
     }
 
     public getRenderedContent(): string {
@@ -26,15 +26,14 @@ export class RootComponent extends Component {
 
         this.markDirty(false);
         if (template) {
-            var partials;
-            var renderedState = <{ [key: string]: any }>{ ...this.state, ...this.getRenderedChildren() };
+            var partials = <{ [key: string]: any }>{ ...this.getRenderedChildren() };
 
             for (let key in this.children) {
                 let child = this.children[key];
-                renderedState[key] = child.getRenderedContent();
+                partials[key] = child.getRenderedContent();
             }
 
-            return render(template, renderedState, partials);
+            return render(template, this.state, partials);
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿import { Component, ComponentOptions } from "./Component";
+﻿import { Component, ComponentProps } from "./Component";
 import { HeaderComponent, HeaderComponentProps } from "./HeaderComponent";
 import { ListComponent, ListComponentProps } from "./ListComponent";
 
-export interface PageComponentProps extends ComponentOptions {
+export interface PageComponentProps extends ComponentProps {
     header: HeaderComponentProps
     list: ListComponentProps
 }
@@ -17,7 +17,7 @@ export class PageComponent extends Component {
     }
 
     public getTemplate(): string {
-        return `<div>{{header}}</div>
-                <div>{{list}}</div>`;
+        return `<div>{{>header}}</div>
+                <div>{{>list}}</div>`;
     }
 }

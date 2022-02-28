@@ -1,7 +1,7 @@
-﻿import { Component, ComponentOptions } from "./Component";
+﻿import { Component, ComponentProps } from "./Component";
 import { TextItemComponent } from "./TextItemComponent";
 
-export interface ListComponentProps extends ComponentOptions {
+export interface ListComponentProps extends ComponentProps {
     items: []
 }
 
@@ -16,6 +16,8 @@ export class ListComponent extends Component {
     }
 
     public getRenderedChildren() {
+        console.log({ children: this.getChildren() });
+
         return {
             children: this.getChildren()
         }
@@ -23,7 +25,7 @@ export class ListComponent extends Component {
 
     public getTemplate(): string {
         return `{{#children}}
-                * {{getRenderedContent}}
+                * {{>getRenderedContent}}
                 {{/children}}`;
     }
 }

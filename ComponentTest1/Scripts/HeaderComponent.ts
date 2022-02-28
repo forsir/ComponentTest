@@ -1,12 +1,10 @@
-﻿import { Component, ComponentOptions } from "./Component";
+﻿import { Component, ComponentProps } from "./Component";
 
-export interface HeaderComponentProps extends ComponentOptions {
+export interface HeaderComponentProps extends ComponentProps {
     title: string
 }
 
 export class HeaderComponent extends Component {
-    protected props: HeaderComponentProps;
-
     constructor(opts: HeaderComponentProps) {
         super(opts);
     }

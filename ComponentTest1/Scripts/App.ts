@@ -1,5 +1,4 @@
-﻿import { ComponentOptions } from "./Component";
-import { Dictionary } from "./Dictionary";
+﻿import { Dictionary } from "./Common/Dictionary";
 import { RootComponent } from "./RootComponent";
 
 declare global {

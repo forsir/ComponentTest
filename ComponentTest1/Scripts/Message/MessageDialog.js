@@ -1,7 +1,7 @@
 "use strict";
 exports.__esModule = true;
 exports.MessageDialog = void 0;
-var Dictionary_1 = require("./Dictionary");
+var Dictionary_1 = require("../Common/Dictionary");
 var MessageDialogComponent_1 = require("./MessageDialogComponent");
 var MessageDialog = (function () {
     function MessageDialog() {

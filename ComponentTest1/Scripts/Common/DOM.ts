@@ -1,4 +1,4 @@
-import { ComponentInterface } from "./Component";
+import { ComponentInterface } from "../Component";
 //import { Logger } from "./Shared/common/Logger";
 
 export class DOM {

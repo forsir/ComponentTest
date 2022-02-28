@@ -15,22 +15,22 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-exports.PageComponent = void 0;
-var Component_1 = require("./Component");
-var HeaderComponent_1 = require("./HeaderComponent");
-var ListComponent_1 = require("./ListComponent");
-var PageComponent = (function (_super) {
-    __extends(PageComponent, _super);
-    function PageComponent(opts) {
-        var _this = _super.call(this, opts) || this;
-        _this.addChild('header', new HeaderComponent_1.HeaderComponent(opts.header));
-        _this.addChild('list', new ListComponent_1.ListComponent(opts.list));
-        return _this;
+exports.MessageDialogButtonComponent = void 0;
+var ButtonComponent_1 = require("../ButtonComponent");
+var MessageDialogButtonComponent = (function (_super) {
+    __extends(MessageDialogButtonComponent, _super);
+    function MessageDialogButtonComponent() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    PageComponent.prototype.getTemplate = function () {
-        return "<div>{{>header}}</div>\n                <div>{{>list}}</div>";
+    MessageDialogButtonComponent.prototype.onClick = function () {
+        if (this.props.action) {
+            this.props.action();
+        }
     };
-    return PageComponent;
-}(Component_1.Component));
-exports.PageComponent = PageComponent;
-//# sourceMappingURL=PageComponent.js.map
+    MessageDialogButtonComponent.prototype.getTemplate = function () {
+        return "{{text}}";
+    };
+    return MessageDialogButtonComponent;
+}(ButtonComponent_1.ButtonComponent));
+exports.MessageDialogButtonComponent = MessageDialogButtonComponent;
+//# sourceMappingURL=MessageDialogButtonComponent.js.map

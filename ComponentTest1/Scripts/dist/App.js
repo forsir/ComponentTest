@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-var Dictionary_1 = require("./Dictionary");
+var Dictionary_1 = require("./Common/Dictionary");
 var RootComponent_1 = require("./RootComponent");
 window.addEventListener('load', function (event) {
     console.log("app start");

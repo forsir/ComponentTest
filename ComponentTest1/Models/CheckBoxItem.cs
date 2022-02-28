@@ -2,6 +2,9 @@
 {
     public class CheckBoxItem : Item
     {
-        public bool Value { get; set; }
+        public CheckBoxItem(string description, bool value) : base(description)
+        {
+            State = new { Description = description, Value = value };
+        }
     }
 }

@@ -12,9 +12,9 @@ var __assign = (this && this.__assign) || function () {
 };
 exports.__esModule = true;
 exports.Component = exports.EvtSource = void 0;
-var EventsListener_1 = require("./EventsListener");
-var BroadcastData_1 = require("./BroadcastData");
-var RenderQueue_1 = require("./RenderQueue");
+var EventsListener_1 = require("./Common/EventsListener");
+var BroadcastData_1 = require("./Common/BroadcastData");
+var RenderQueue_1 = require("./Common/RenderQueue");
 var mustache_1 = require("mustache");
 var RootComponent_1 = require("./RootComponent");
 var __uid = 0;
@@ -55,16 +55,16 @@ var EvtSource = (function () {
 }());
 exports.EvtSource = EvtSource;
 var Component = (function () {
-    function Component(opts) {
-        if (opts === void 0) { opts = {}; }
+    function Component(props) {
+        if (props === void 0) { props = {}; }
         this.children = {};
         this.state = {};
         this._isDirty = true;
         this.eventSrc = new EvtSource();
-        if (opts.state) {
-            this.setState(opts.state);
+        if (props.state) {
+            this.setState(props.state);
         }
-        this.cid = opts.id || "mqC-" + ++__uid;
+        this.cid = props.id || "mqC-" + ++__uid;
         this.onCreated();
     }
     Component.prototype.getId = function () {
@@ -270,13 +270,12 @@ var Component = (function () {
         var template = this.getTemplate();
         this.markDirty(false);
         if (template) {
-            var partials;
-            var renderedState = __assign(__assign({}, this.state), this.getRenderedChildren());
+            var partials = __assign({}, this.getRenderedChildren());
             for (var key in this.children) {
                 var child = this.children[key];
-                renderedState[key] = child.getRenderedContent();
+                partials[key] = child.getRenderedContent();
             }
-            return '<div id="' + this.getId() + '">' + (0, mustache_1.render)(template, renderedState, partials) + '</div>';
+            return '<div id="' + this.getId() + '">' + (0, mustache_1.render)(template, this.state, partials) + '</div>';
         }
     };
     Component.prototype._render = function () {

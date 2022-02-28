@@ -1,7 +1,6 @@
-import { EventsListener } from "./EventsListener";
-import { BroadcastData } from "./BroadcastData";
-import { enqueueRender } from "./RenderQueue";
-import { DOM } from "./DOM";
+import { EventsListener } from "./Common/EventsListener";
+import { BroadcastData } from "./Common/BroadcastData";
+import { enqueueRender } from "./Common/RenderQueue";
 import { render } from 'mustache';
 import { RootComponent } from "./RootComponent";
 
@@ -98,7 +97,7 @@ export interface ComponentInterface {
     getRenderedContent(): string;
 }
 
-export interface ComponentOptions {
+export interface ComponentProps {
     id?: string;
     state?: {};
 }
@@ -114,12 +113,12 @@ export abstract class Component implements ComponentInterface, EventListener {
 
     protected eventSrc: EvtSource = new EvtSource();
 
-    constructor(opts: ComponentOptions = {}) {
-        if (opts.state) {
-            this.setState(opts.state);
+    constructor(props: ComponentProps = {}) {
+        if (props.state) {
+            this.setState(props.state);
         }
 
-        this.cid = opts.id || "mqC-" + ++__uid;
+        this.cid = props.id || "mqC-" + ++__uid;
 
         this.onCreated();
     }
@@ -401,15 +400,14 @@ export abstract class Component implements ComponentInterface, EventListener {
 
         this.markDirty(false);
         if (template) {
-            var partials;
-            var renderedState = <{ [key: string]: any }>{ ...this.state, ...this.getRenderedChildren() };
+            var partials = <{ [key: string]: any }>{ ...this.getRenderedChildren() };
 
             for (let key in this.children) {
                 let child = this.children[key];
-                renderedState[key] = child.getRenderedContent();
+                partials[key] = child.getRenderedContent();
             }
 
-            return '<div id="' + this.getId() + '">' + render(template, renderedState, partials) + '</div>';
+            return '<div id="' + this.getId() + '">' + render(template, this.state, partials) + '</div>';
         }
     }
 

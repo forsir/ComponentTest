@@ -1,4 +1,4 @@
-﻿import { ButtonComponent, ButtonProps } from "./ButtonComponent";
+﻿import { ButtonComponent, ButtonProps } from "../ButtonComponent";
 
 export interface MessageDialogButtonProps extends ButtonProps {
     text: string;
