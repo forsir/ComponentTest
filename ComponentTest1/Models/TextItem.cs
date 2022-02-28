@@ -2,7 +2,7 @@
 {
     public class TextItem : Item
     {
-        public TextItem(string description, string value) : base(description)
+        public TextItem(string description, string value) : base(description, 1)
         {
             State = new { Description = description, Value = value };
         }

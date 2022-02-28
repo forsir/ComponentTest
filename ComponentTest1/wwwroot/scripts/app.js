@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -103,11 +103,11 @@ var __assign = (this && this.__assign) || function () {
 };
 exports.__esModule = true;
 exports.Component = exports.EvtSource = void 0;
-var EventsListener_1 = __webpack_require__(5);
-var BroadcastData_1 = __webpack_require__(7);
-var RenderQueue_1 = __webpack_require__(8);
-var mustache_1 = __webpack_require__(2);
-var RootComponent_1 = __webpack_require__(1);
+var EventsListener_1 = __webpack_require__(6);
+var BroadcastData_1 = __webpack_require__(8);
+var RenderQueue_1 = __webpack_require__(9);
+var mustache_1 = __webpack_require__(3);
+var RootComponent_1 = __webpack_require__(2);
 var __uid = 0;
 var EvtSource = (function () {
     function EvtSource() {
@@ -243,7 +243,11 @@ var Component = (function () {
         this.children = {};
     };
     Component.prototype.getChildren = function () {
-        return this.children;
+        var values = [];
+        for (var key in this.children) {
+            values.push(this.children[key]);
+        }
+        return values;
     };
     Component.prototype.findChild = function (id) {
         return this.children[id];
@@ -361,12 +365,15 @@ var Component = (function () {
         var template = this.getTemplate();
         this.markDirty(false);
         if (template) {
+            var state = __assign(__assign({}, this.state), this.getRenderedChildren());
             var partials = __assign({}, this.getRenderedChildren());
             for (var key in this.children) {
                 var child = this.children[key];
                 partials[key] = child.getRenderedContent();
             }
-            return '<div id="' + this.getId() + '">' + mustache_1.render(template, this.state, partials) + '</div>';
+            var result = '<div id="' + this.getId() + '">' + mustache_1.render(template, state, partials) + '</div>';
+            console.log(result);
+            return result;
         }
     };
     Component.prototype._render = function () {
@@ -403,6 +410,38 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+exports.__esModule = true;
+exports.ItemComponent = void 0;
+var Component_1 = __webpack_require__(0);
+var ItemComponent = (function (_super) {
+    __extends(ItemComponent, _super);
+    function ItemComponent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return ItemComponent;
+}(Component_1.Component));
+exports.ItemComponent = ItemComponent;
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -416,9 +455,9 @@ var __assign = (this && this.__assign) || function () {
 };
 exports.__esModule = true;
 exports.RootComponent = void 0;
-var mustache_1 = __webpack_require__(2);
+var mustache_1 = __webpack_require__(3);
 var Component_1 = __webpack_require__(0);
-var PageComponent_1 = __webpack_require__(9);
+var PageComponent_1 = __webpack_require__(10);
 var RootComponent = (function (_super) {
     __extends(RootComponent, _super);
     function RootComponent(props) {
@@ -448,7 +487,7 @@ exports.RootComponent = RootComponent;
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function (global, factory) {
@@ -1225,14 +1264,14 @@ exports.RootComponent = RootComponent;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-var Dictionary_1 = __webpack_require__(4);
-var RootComponent_1 = __webpack_require__(1);
+var Dictionary_1 = __webpack_require__(5);
+var RootComponent_1 = __webpack_require__(2);
 window.addEventListener('load', function (event) {
     console.log("app start");
     Dictionary_1.Dictionary.setVocabulary(window.vocabulary || {});
@@ -1244,7 +1283,7 @@ window.addEventListener('load', function (event) {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1274,14 +1313,14 @@ exports.Dictionary = Dictionary;
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
 exports.EventsListener = void 0;
-var Logger_1 = __webpack_require__(6);
+var Logger_1 = __webpack_require__(7);
 var EventsListener = (function () {
     function EventsListener(listener) {
         this.events = {};
@@ -1351,7 +1390,7 @@ exports.EventsListener = EventsListener;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1452,7 +1491,7 @@ exports.Logger = Logger;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1506,7 +1545,7 @@ exports.BroadcastData = BroadcastData;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1538,7 +1577,7 @@ exports.rerender = rerender;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1559,8 +1598,8 @@ var __extends = (this && this.__extends) || (function () {
 exports.__esModule = true;
 exports.PageComponent = void 0;
 var Component_1 = __webpack_require__(0);
-var HeaderComponent_1 = __webpack_require__(10);
-var ListComponent_1 = __webpack_require__(11);
+var HeaderComponent_1 = __webpack_require__(11);
+var ListComponent_1 = __webpack_require__(12);
 var PageComponent = (function (_super) {
     __extends(PageComponent, _super);
     function PageComponent(opts) {
@@ -1578,7 +1617,7 @@ exports.PageComponent = PageComponent;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1613,52 +1652,6 @@ exports.HeaderComponent = HeaderComponent;
 
 
 /***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-exports.__esModule = true;
-exports.ListComponent = void 0;
-var Component_1 = __webpack_require__(0);
-var TextItemComponent_1 = __webpack_require__(12);
-var ListComponent = (function (_super) {
-    __extends(ListComponent, _super);
-    function ListComponent(props) {
-        var _this = _super.call(this, props) || this;
-        for (var i = 0; i < props.items.length; i++) {
-            _this.addChild(null, new TextItemComponent_1.TextItemComponent(props.items[i]));
-        }
-        return _this;
-    }
-    ListComponent.prototype.getRenderedChildren = function () {
-        console.log({ children: this.getChildren() });
-        return {
-            children: this.getChildren()
-        };
-    };
-    ListComponent.prototype.getTemplate = function () {
-        return "{{#children}}\n                * {{>getRenderedContent}}\n                {{/children}}";
-    };
-    return ListComponent;
-}(Component_1.Component));
-exports.ListComponent = ListComponent;
-
-
-/***/ }),
 /* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1678,21 +1671,45 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-exports.TextItemComponent = void 0;
-var ItemComponent_1 = __webpack_require__(13);
-var TextItemComponent = (function (_super) {
-    __extends(TextItemComponent, _super);
-    function TextItemComponent(opts) {
-        var _this = _super.call(this, opts) || this;
-        _this.props = opts;
+exports.ListComponent = void 0;
+var CheckBoxItemComponent_1 = __webpack_require__(13);
+var Component_1 = __webpack_require__(0);
+var DatasetItemComponent_1 = __webpack_require__(14);
+var ItemComponent_1 = __webpack_require__(1);
+var TextItemComponent_1 = __webpack_require__(15);
+var ListComponent = (function (_super) {
+    __extends(ListComponent, _super);
+    function ListComponent(props) {
+        var _this = _super.call(this, props) || this;
+        for (var i = 0; i < props.items.length; i++) {
+            _this.addChild(null, _this.createChildren(props.items[i]));
+        }
         return _this;
     }
-    TextItemComponent.prototype.getTemplate = function () {
-        return "<span style=\"font-weight:bold\">{{description}}:</span>\n                <span>{{value}}</span>";
+    ListComponent.prototype.createChildren = function (props) {
+        if (props.type == 1) {
+            return new TextItemComponent_1.TextItemComponent(props);
+        }
+        if (props.type == 2) {
+            return new CheckBoxItemComponent_1.CheckBoxItemComponent(props);
+        }
+        if (props.type == 3) {
+            return new DatasetItemComponent_1.DatasetItemComponent(props);
+        }
+        return new ItemComponent_1.ItemComponent(props);
     };
-    return TextItemComponent;
-}(ItemComponent_1.ItemComponent));
-exports.TextItemComponent = TextItemComponent;
+    ListComponent.prototype.getRenderedChildren = function () {
+        console.log({ children: this.getChildren() });
+        return {
+            children: this.getChildren().map(function (c) { return c.getRenderedContent(); })
+        };
+    };
+    ListComponent.prototype.getTemplate = function () {
+        return "{{#children}}\n                {{{.}}}\n                {{/children}}";
+    };
+    return ListComponent;
+}(Component_1.Component));
+exports.ListComponent = ListComponent;
 
 
 /***/ }),
@@ -1715,16 +1732,93 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-exports.ItemComponent = void 0;
-var Component_1 = __webpack_require__(0);
-var ItemComponent = (function (_super) {
-    __extends(ItemComponent, _super);
-    function ItemComponent() {
-        return _super !== null && _super.apply(this, arguments) || this;
+exports.CheckBoxItemComponent = void 0;
+var ItemComponent_1 = __webpack_require__(1);
+var CheckBoxItemComponent = (function (_super) {
+    __extends(CheckBoxItemComponent, _super);
+    function CheckBoxItemComponent(opts) {
+        return _super.call(this, opts) || this;
     }
-    return ItemComponent;
-}(Component_1.Component));
-exports.ItemComponent = ItemComponent;
+    CheckBoxItemComponent.prototype.getTemplate = function () {
+        return "<span style=\"font-weight:bold\">{{description}}:</span>\n                <span>{{#value}}checked{{/value}}{{^value}}not{{/value}}</span>";
+    };
+    return CheckBoxItemComponent;
+}(ItemComponent_1.ItemComponent));
+exports.CheckBoxItemComponent = CheckBoxItemComponent;
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+exports.__esModule = true;
+exports.DatasetItemComponent = void 0;
+var ItemComponent_1 = __webpack_require__(1);
+var DatasetItemComponent = (function (_super) {
+    __extends(DatasetItemComponent, _super);
+    function DatasetItemComponent(opts) {
+        var _this = _super.call(this, opts) || this;
+        _this.props = opts;
+        return _this;
+    }
+    DatasetItemComponent.prototype.getTemplate = function () {
+        return "<span style=\"font-weight:bold\">{{description}}:</span>\n                <span>{{value}}</span>";
+    };
+    return DatasetItemComponent;
+}(ItemComponent_1.ItemComponent));
+exports.DatasetItemComponent = DatasetItemComponent;
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+exports.__esModule = true;
+exports.TextItemComponent = void 0;
+var ItemComponent_1 = __webpack_require__(1);
+var TextItemComponent = (function (_super) {
+    __extends(TextItemComponent, _super);
+    function TextItemComponent(opts) {
+        var _this = _super.call(this, opts) || this;
+        _this.props = opts;
+        return _this;
+    }
+    TextItemComponent.prototype.getTemplate = function () {
+        return "<span style=\"font-weight:bold\">{{description}}:</span>\n                <span>{{value}}</span>";
+    };
+    return TextItemComponent;
+}(ItemComponent_1.ItemComponent));
+exports.TextItemComponent = TextItemComponent;
 
 
 /***/ })

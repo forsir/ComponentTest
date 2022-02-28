@@ -152,7 +152,11 @@ var Component = (function () {
         this.children = {};
     };
     Component.prototype.getChildren = function () {
-        return this.children;
+        var values = [];
+        for (var key in this.children) {
+            values.push(this.children[key]);
+        }
+        return values;
     };
     Component.prototype.findChild = function (id) {
         return this.children[id];
@@ -270,12 +274,15 @@ var Component = (function () {
         var template = this.getTemplate();
         this.markDirty(false);
         if (template) {
+            var state = __assign(__assign({}, this.state), this.getRenderedChildren());
             var partials = __assign({}, this.getRenderedChildren());
             for (var key in this.children) {
                 var child = this.children[key];
                 partials[key] = child.getRenderedContent();
             }
-            return '<div id="' + this.getId() + '">' + (0, mustache_1.render)(template, this.state, partials) + '</div>';
+            var result = '<div id="' + this.getId() + '">' + (0, mustache_1.render)(template, state, partials) + '</div>';
+            console.log(result);
+            return result;
         }
     };
     Component.prototype._render = function () {

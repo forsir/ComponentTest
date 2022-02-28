@@ -82,7 +82,7 @@ export interface ComponentInterface {
 
     deleteAllChildren(): void;
 
-    getChildren(): { [id: string]: ComponentInterface };
+    getChildren(): ComponentInterface[]; //{ [id: string]: ComponentInterface };
 
     findChild(id: string): ComponentInterface;
 
@@ -106,7 +106,7 @@ export abstract class Component implements ComponentInterface, EventListener {
     protected parent: ComponentInterface;
     protected children: { [id: string]: ComponentInterface } = {};
     protected cid: string;
-    protected state: object = {};
+    protected state: any = {};
     private $element: HTMLElement;
     private _isDirty: boolean = true;
     private _eventResolver: EventsListener;
@@ -228,7 +228,11 @@ export abstract class Component implements ComponentInterface, EventListener {
     }
 
     public getChildren() {
-        return this.children;
+        var values = [];
+        for (let key in this.children) {
+            values.push(this.children[key]);
+        }
+        return values;
     }
 
     public findChild(id: string) {
@@ -400,6 +404,7 @@ export abstract class Component implements ComponentInterface, EventListener {
 
         this.markDirty(false);
         if (template) {
+            var state = <{ [key: string]: any }>{ ...this.state, ...this.getRenderedChildren() };
             var partials = <{ [key: string]: any }>{ ...this.getRenderedChildren() };
 
             for (let key in this.children) {
@@ -407,7 +412,9 @@ export abstract class Component implements ComponentInterface, EventListener {
                 partials[key] = child.getRenderedContent();
             }
 
-            return '<div id="' + this.getId() + '">' + render(template, this.state, partials) + '</div>';
+            var result = '<div id="' + this.getId() + '">' + render(template, state, partials) + '</div>';
+            console.log(result);
+            return result;
         }
     }
 
