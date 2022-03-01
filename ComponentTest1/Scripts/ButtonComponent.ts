@@ -2,6 +2,7 @@
 
 export interface ButtonProps {
     command?: any;
+
     disabled?: boolean;
     hidden?: boolean;
 }
@@ -15,7 +16,7 @@ export class ButtonComponent extends Component {
 
     protected onMount() {
         super.onMount();
-        this.on("click", 'invokeAction');
+        this.on("click", 'onClick');
     }
 
     protected onAfterUpdate() {
@@ -44,13 +45,10 @@ export class ButtonComponent extends Component {
         }
     }
 
-    private invokeAction() {
-        if (!this.props.disabled) {
-            this.onClick();
-        }
-    }
-
+    // TODO finish it
     protected onClick() {
-        this.broadcast(this.props.command);
+        if (!this.props.disabled) {
+            this.broadcast(this.props.command, this.props.command);
+        }
     }
 }

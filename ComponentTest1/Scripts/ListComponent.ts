@@ -9,8 +9,6 @@ export interface ListComponentProps extends ComponentProps {
 }
 
 export class ListComponent extends Component {
-    protected props: ListComponentProps;
-
     constructor(props: ListComponentProps) {
         super(props);
         for (var i = 0; i < props.items.length; i++) {
@@ -32,8 +30,6 @@ export class ListComponent extends Component {
     }
 
     public getRenderedChildren() {
-        console.log({ children: this.getChildren() });
-
         return {
             children: this.getChildren().map(c => c.getRenderedContent())
         }

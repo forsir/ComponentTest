@@ -13,10 +13,9 @@ var __assign = (this && this.__assign) || function () {
 exports.__esModule = true;
 exports.Component = exports.EvtSource = void 0;
 var EventsListener_1 = require("./Common/EventsListener");
-var BroadcastData_1 = require("./Common/BroadcastData");
 var RenderQueue_1 = require("./Common/RenderQueue");
 var mustache_1 = require("mustache");
-var RootComponent_1 = require("./RootComponent");
+var InternalEvent_1 = require("./Common/InternalEvent");
 var __uid = 0;
 var EvtSource = (function () {
     function EvtSource() {
@@ -82,6 +81,14 @@ var Component = (function () {
     Component.prototype.mount = function ($element) {
         this.onBeforeMount($element);
         var id = this.getId();
+        console.log("mount", id);
+        if (!$element) {
+            $element = document.getElementById(id);
+            if (!$element) {
+                console.log(id, "not found");
+                return false;
+            }
+        }
         if (!$element.id) {
             $element.id = id;
         }
@@ -92,14 +99,27 @@ var Component = (function () {
         this.$element = $element;
         this._eventResolver = new EventsListener_1.EventsListener(this);
         this.onMount();
+        return true;
+    };
+    Component.prototype.mountChildren = function () {
+        for (var key in this.children) {
+            var child = this.children[key];
+            child.unmount();
+            if (child.mount()) {
+                child.mountChildren();
+            }
+        }
     };
     Component.prototype.unmount = function () {
-        this.eventSrc.remove();
+        if (!this.$element) {
+            return;
+        }
         this._eventResolver.remove();
         for (var key in this.children) {
             var child = this.children[key];
             child.unmount();
         }
+        this.$element = null;
         this.onUnmount();
     };
     Component.prototype.markDirty = function (isDirty) {
@@ -174,7 +194,9 @@ var Component = (function () {
         }
         if (needRender) {
             this.onBeforeRender();
+            console.time("render");
             this._render();
+            console.timeEnd("render");
             this.onAfterRender();
         }
         this.onAfterChildrenRendered();
@@ -184,26 +206,11 @@ var Component = (function () {
     };
     Component.prototype.onBroadcast = function (ed) {
     };
-    Component.prototype.broadcast = function () {
-        var actions = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            actions[_i] = arguments[_i];
-        }
-        var ed = new BroadcastData_1.BroadcastData(this, actions);
-        RootComponent_1.RootComponent.root.walk(function (component) {
-            if (component['onBroadcast'] !== undefined) {
-                component['onBroadcast'](ed);
-            }
-        });
-        return this;
+    Component.prototype.broadcast = function (actionType, data) {
+        InternalEvent_1.InternalEvent.Invoke(actionType, this, data);
     };
-    Component.prototype.walk = function (callback) {
-        for (var key in this.children) {
-            var child = this.children[key];
-            child.walk(callback);
-        }
-        callback(this);
-        return this;
+    Component.prototype.broadcastregister = function (actionType, action) {
+        InternalEvent_1.InternalEvent.Register(actionType, action);
     };
     Component.prototype.onCreated = function () {
     };
@@ -274,24 +281,32 @@ var Component = (function () {
         var template = this.getTemplate();
         this.markDirty(false);
         if (template) {
-            var state = __assign(__assign({}, this.state), this.getRenderedChildren());
-            var partials = __assign({}, this.getRenderedChildren());
-            for (var key in this.children) {
-                var child = this.children[key];
-                partials[key] = child.getRenderedContent();
+            var renderedChildren = this.getRenderedChildren();
+            var state = __assign(__assign({}, this.state), renderedChildren);
+            var partials = __assign({}, renderedChildren);
+            if (template.indexOf('{>') > 0) {
+                for (var key in this.children) {
+                    var child = this.children[key];
+                    partials[key] = child.getRenderedContent();
+                }
             }
             var result = '<div id="' + this.getId() + '">' + (0, mustache_1.render)(template, state, partials) + '</div>';
-            console.log(result);
             return result;
         }
     };
     Component.prototype._render = function () {
         this.markDirty(false);
         var rendered = this.getRenderedContent();
+        var hadElement = this.hasElement();
         var element = this.getElement();
         if (element) {
             if (element.innerHTML !== rendered) {
+                console.log("Rendered", rendered);
                 element.innerHTML = rendered;
+                if (!hadElement) {
+                    this.mount(element);
+                }
+                this.mountChildren();
             }
         }
     };

@@ -43,7 +43,6 @@ var ListComponent = (function (_super) {
         return new ItemComponent_1.ItemComponent(props);
     };
     ListComponent.prototype.getRenderedChildren = function () {
-        console.log({ children: this.getChildren() });
         return {
             children: this.getChildren().map(function (c) { return c.getRenderedContent(); })
         };

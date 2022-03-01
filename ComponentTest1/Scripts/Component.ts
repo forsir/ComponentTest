@@ -3,6 +3,7 @@ import { BroadcastData } from "./Common/BroadcastData";
 import { enqueueRender } from "./Common/RenderQueue";
 import { render } from 'mustache';
 import { RootComponent } from "./RootComponent";
+import { InternalEvent } from "./Common/InternalEvent";
 
 let __uid = 0;
 
@@ -50,7 +51,9 @@ export class EvtSource {
 }
 
 export interface ComponentInterface {
-    mount($element: HTMLElement): void;
+    mount($element?: HTMLElement): boolean;
+
+    mountChildren(): void;
 
     unmount(): void;
 
@@ -89,8 +92,6 @@ export interface ComponentInterface {
     markDirty(isDirty?: boolean): void;
 
     isDirty(): boolean;
-
-    walk(callback: Function): void;
 
     getRenderedChildren(): {};
 
@@ -139,10 +140,20 @@ export abstract class Component implements ComponentInterface, EventListener {
         return this.parent;
     }
 
-    public mount($element: HTMLElement): void {
+    public mount($element?: HTMLElement): boolean {
         this.onBeforeMount($element);
 
         let id = this.getId();
+
+        console.log("mount", id);
+
+        if (!$element) {
+            $element = document.getElementById(id);
+            if (!$element) {
+                console.log(id, "not found");
+                return false;
+            }
+        }
 
         if (!$element.id) {
             $element.id = id;
@@ -156,15 +167,32 @@ export abstract class Component implements ComponentInterface, EventListener {
         this._eventResolver = new EventsListener(this);
 
         this.onMount();
+
+        return true;
+    }
+
+    public mountChildren() {
+        for (let key in this.children) {
+            let child = this.children[key];
+            child.unmount();
+            if (child.mount()) {
+                child.mountChildren();
+            }
+        }
     }
 
     public unmount() {
-        this.eventSrc.remove();
+        if (!this.$element) {
+            return;
+        }
+
+        //this.eventSrc.remove();
         this._eventResolver.remove();
         for (let key in this.children) {
             let child = this.children[key];
             child.unmount();
         }
+        this.$element = null;
         this.onUnmount();
     }
 
@@ -255,14 +283,11 @@ export abstract class Component implements ComponentInterface, EventListener {
 
         if (needRender) {
             this.onBeforeRender();
+            console.time("render");
             this._render();
+            console.timeEnd("render");
             this.onAfterRender();
         }
-
-        //for (let key in this.children) {
-        //    let child = this.children[key];
-        //    child.render();
-        //}
 
         this.onAfterChildrenRendered();
     }
@@ -274,33 +299,12 @@ export abstract class Component implements ComponentInterface, EventListener {
     public onBroadcast(ed: BroadcastData) { /* abstract */
     }
 
-    /**
-     * You can pass list of actions or a map of action -> data.
-     * Examples:
-     * - broadcast('action1', 'action2', ...)
-     * - broadcast({action1: data, action2: data, ...})
-     * @param actions
-     * @returns {Component}
-     */
-    public broadcast(...actions: any[]) {
-        let ed = new BroadcastData(this, actions);
-        RootComponent.root.walk(function (component: ComponentInterface | any) {
-            if (component['onBroadcast'] !== undefined) {
-                component['onBroadcast'](ed);
-            }
-        });
-
-        return this;
+    public broadcast(actionType: string, data: any) {
+        InternalEvent.Invoke(actionType, this, data);
     }
 
-    public walk(callback: Function) {
-        for (let key in this.children) {
-            let child = this.children[key];
-            child.walk(callback);
-        }
-        callback(this);
-
-        return this;
+    public broadcastregister(actionType: string, action: Function) {
+        InternalEvent.Register(actionType, action);
     }
 
     protected onCreated() { /* abstract */
@@ -404,16 +408,19 @@ export abstract class Component implements ComponentInterface, EventListener {
 
         this.markDirty(false);
         if (template) {
-            var state = <{ [key: string]: any }>{ ...this.state, ...this.getRenderedChildren() };
-            var partials = <{ [key: string]: any }>{ ...this.getRenderedChildren() };
+            var renderedChildren = this.getRenderedChildren();
+            var state = <{ [key: string]: any }>{ ...this.state, ...renderedChildren };
+            var partials = <{ [key: string]: any }>{ ...renderedChildren };
 
-            for (let key in this.children) {
-                let child = this.children[key];
-                partials[key] = child.getRenderedContent();
+            if (template.indexOf('{>') > 0) {
+                for (let key in this.children) {
+                    let child = this.children[key];
+                    partials[key] = child.getRenderedContent();
+                }
             }
 
             var result = '<div id="' + this.getId() + '">' + render(template, state, partials) + '</div>';
-            console.log(result);
+            //console.log(result);
             return result;
         }
     }
@@ -423,10 +430,17 @@ export abstract class Component implements ComponentInterface, EventListener {
 
         const rendered = this.getRenderedContent();
 
+        var hadElement = this.hasElement();
+
         let element = this.getElement();
         if (element) {
             if (element.innerHTML !== rendered) {
+                console.log("Rendered", rendered);
                 element.innerHTML = rendered;
+                if (!hadElement) {
+                    this.mount(element);
+                }
+                this.mountChildren();
             }
         }
     }

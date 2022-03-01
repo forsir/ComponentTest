@@ -30,6 +30,7 @@ var CheckBoxItemComponent = (function (_super) {
         return "<span style=\"font-weight:bold\">{{description}}:</span>\n                <span>{{#value}}checked{{/value}}{{^value}}not{{/value}}</span>";
     };
     CheckBoxItemComponent.prototype.onClick = function () {
+        console.log('clicked');
         this.updateStateProperties({ value: !this.state.value });
     };
     return CheckBoxItemComponent;

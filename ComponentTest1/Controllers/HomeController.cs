@@ -24,6 +24,27 @@ namespace ComponentTest1.Controllers
                     new List<string>{ "Jedna", "Dva", "Tři" })
                 });
 
+            //        Page data = new("Zkušební stránka",
+            //    new List<ListPage> {
+            //                new ListPage(
+            //                    new List<Item>
+            //                    {
+            //                        new TextItem("Textová položka", "cokoliv"),
+            //                        new CheckBoxItem( "Bool položka", true),
+            //                        new DatasetItem("Seznam", "Jedna",
+            //                        new List<string>{ "Jedna", "Dva", "Tři" })
+            //                    }),
+            //                new ListPage(
+            //                    new List<Item>
+            //                    {
+            //                        new SelectItem("Textová položka"),
+            //                        new SelectItem( "Bool položka"),
+            //                        new SelectItem("Seznam")
+            //                    }
+            //                )
+            //    }
+            //);
+
             return View(data);
         }
 

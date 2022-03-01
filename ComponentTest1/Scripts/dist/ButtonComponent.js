@@ -27,7 +27,7 @@ var ButtonComponent = (function (_super) {
     };
     ButtonComponent.prototype.onMount = function () {
         _super.prototype.onMount.call(this);
-        this.on("click", 'invokeAction');
+        this.on("click", 'onClick');
     };
     ButtonComponent.prototype.onAfterUpdate = function () {
         _super.prototype.onAfterUpdate.call(this);
@@ -54,13 +54,10 @@ var ButtonComponent = (function (_super) {
             this.removeClassName("hidden");
         }
     };
-    ButtonComponent.prototype.invokeAction = function () {
-        if (!this.props.disabled) {
-            this.onClick();
-        }
-    };
     ButtonComponent.prototype.onClick = function () {
-        this.broadcast(this.props.command);
+        if (!this.props.disabled) {
+            this.broadcast(this.props.command, this.props.command);
+        }
     };
     return ButtonComponent;
 }(Component_1.Component));

@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -104,10 +104,9 @@ var __assign = (this && this.__assign) || function () {
 exports.__esModule = true;
 exports.Component = exports.EvtSource = void 0;
 var EventsListener_1 = __webpack_require__(6);
-var BroadcastData_1 = __webpack_require__(8);
-var RenderQueue_1 = __webpack_require__(9);
-var mustache_1 = __webpack_require__(3);
-var RootComponent_1 = __webpack_require__(2);
+var RenderQueue_1 = __webpack_require__(8);
+var mustache_1 = __webpack_require__(2);
+var InternalEvent_1 = __webpack_require__(9);
 var __uid = 0;
 var EvtSource = (function () {
     function EvtSource() {
@@ -173,6 +172,14 @@ var Component = (function () {
     Component.prototype.mount = function ($element) {
         this.onBeforeMount($element);
         var id = this.getId();
+        console.log("mount", id);
+        if (!$element) {
+            $element = document.getElementById(id);
+            if (!$element) {
+                console.log(id, "not found");
+                return false;
+            }
+        }
         if (!$element.id) {
             $element.id = id;
         }
@@ -183,14 +190,27 @@ var Component = (function () {
         this.$element = $element;
         this._eventResolver = new EventsListener_1.EventsListener(this);
         this.onMount();
+        return true;
+    };
+    Component.prototype.mountChildren = function () {
+        for (var key in this.children) {
+            var child = this.children[key];
+            child.unmount();
+            if (child.mount()) {
+                child.mountChildren();
+            }
+        }
     };
     Component.prototype.unmount = function () {
-        this.eventSrc.remove();
+        if (!this.$element) {
+            return;
+        }
         this._eventResolver.remove();
         for (var key in this.children) {
             var child = this.children[key];
             child.unmount();
         }
+        this.$element = null;
         this.onUnmount();
     };
     Component.prototype.markDirty = function (isDirty) {
@@ -265,7 +285,9 @@ var Component = (function () {
         }
         if (needRender) {
             this.onBeforeRender();
+            console.time("render");
             this._render();
+            console.timeEnd("render");
             this.onAfterRender();
         }
         this.onAfterChildrenRendered();
@@ -275,26 +297,11 @@ var Component = (function () {
     };
     Component.prototype.onBroadcast = function (ed) {
     };
-    Component.prototype.broadcast = function () {
-        var actions = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            actions[_i] = arguments[_i];
-        }
-        var ed = new BroadcastData_1.BroadcastData(this, actions);
-        RootComponent_1.RootComponent.root.walk(function (component) {
-            if (component['onBroadcast'] !== undefined) {
-                component['onBroadcast'](ed);
-            }
-        });
-        return this;
+    Component.prototype.broadcast = function (actionType, data) {
+        InternalEvent_1.InternalEvent.Invoke(actionType, this, data);
     };
-    Component.prototype.walk = function (callback) {
-        for (var key in this.children) {
-            var child = this.children[key];
-            child.walk(callback);
-        }
-        callback(this);
-        return this;
+    Component.prototype.broadcastregister = function (actionType, action) {
+        InternalEvent_1.InternalEvent.Register(actionType, action);
     };
     Component.prototype.onCreated = function () {
     };
@@ -365,24 +372,32 @@ var Component = (function () {
         var template = this.getTemplate();
         this.markDirty(false);
         if (template) {
-            var state = __assign(__assign({}, this.state), this.getRenderedChildren());
-            var partials = __assign({}, this.getRenderedChildren());
-            for (var key in this.children) {
-                var child = this.children[key];
-                partials[key] = child.getRenderedContent();
+            var renderedChildren = this.getRenderedChildren();
+            var state = __assign(__assign({}, this.state), renderedChildren);
+            var partials = __assign({}, renderedChildren);
+            if (template.indexOf('{>') > 0) {
+                for (var key in this.children) {
+                    var child = this.children[key];
+                    partials[key] = child.getRenderedContent();
+                }
             }
             var result = '<div id="' + this.getId() + '">' + mustache_1.render(template, state, partials) + '</div>';
-            console.log(result);
             return result;
         }
     };
     Component.prototype._render = function () {
         this.markDirty(false);
         var rendered = this.getRenderedContent();
+        var hadElement = this.hasElement();
         var element = this.getElement();
         if (element) {
             if (element.innerHTML !== rendered) {
+                console.log("Rendered", rendered);
                 element.innerHTML = rendered;
+                if (!hadElement) {
+                    this.mount(element);
+                }
+                this.mountChildren();
             }
         }
     };
@@ -425,69 +440,6 @@ exports.ItemComponent = ItemComponent;
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-exports.__esModule = true;
-exports.RootComponent = void 0;
-var mustache_1 = __webpack_require__(3);
-var Component_1 = __webpack_require__(0);
-var PageComponent_1 = __webpack_require__(10);
-var RootComponent = (function (_super) {
-    __extends(RootComponent, _super);
-    function RootComponent(props) {
-        var _this = _super.call(this, props) || this;
-        RootComponent.root = _this;
-        _this.addChild('page', new PageComponent_1.PageComponent(props));
-        return _this;
-    }
-    RootComponent.prototype.getTemplate = function () {
-        return "{{>page}}";
-    };
-    RootComponent.prototype.getRenderedContent = function () {
-        var template = this.getTemplate();
-        this.markDirty(false);
-        if (template) {
-            var partials = __assign({}, this.getRenderedChildren());
-            for (var key in this.children) {
-                var child = this.children[key];
-                partials[key] = child.getRenderedContent();
-            }
-            return mustache_1.render(template, this.state, partials);
-        }
-    };
-    return RootComponent;
-}(Component_1.Component));
-exports.RootComponent = RootComponent;
-
-
-/***/ }),
-/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function (global, factory) {
@@ -1264,14 +1216,14 @@ exports.RootComponent = RootComponent;
 
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-var Dictionary_1 = __webpack_require__(5);
-var RootComponent_1 = __webpack_require__(2);
+var Dictionary_1 = __webpack_require__(4);
+var RootComponent_1 = __webpack_require__(5);
 window.addEventListener('load', function (event) {
     console.log("app start");
     Dictionary_1.Dictionary.setVocabulary(window.vocabulary || {});
@@ -1283,7 +1235,7 @@ window.addEventListener('load', function (event) {
 
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1310,6 +1262,69 @@ var Dictionary = (function () {
     return Dictionary;
 }());
 exports.Dictionary = Dictionary;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+exports.__esModule = true;
+exports.RootComponent = void 0;
+var mustache_1 = __webpack_require__(2);
+var Component_1 = __webpack_require__(0);
+var PageComponent_1 = __webpack_require__(10);
+var RootComponent = (function (_super) {
+    __extends(RootComponent, _super);
+    function RootComponent(props) {
+        var _this = _super.call(this, props) || this;
+        RootComponent.root = _this;
+        _this.addChild('page', new PageComponent_1.PageComponent(props));
+        return _this;
+    }
+    RootComponent.prototype.getTemplate = function () {
+        return "{{>page}}";
+    };
+    RootComponent.prototype.getRenderedContent = function () {
+        var template = this.getTemplate();
+        this.markDirty(false);
+        if (template) {
+            var partials = __assign({}, this.getRenderedChildren());
+            for (var key in this.children) {
+                var child = this.children[key];
+                partials[key] = child.getRenderedContent();
+            }
+            return mustache_1.render(template, this.state, partials);
+        }
+    };
+    return RootComponent;
+}(Component_1.Component));
+exports.RootComponent = RootComponent;
 
 
 /***/ }),
@@ -1496,60 +1511,6 @@ exports.Logger = Logger;
 
 "use strict";
 
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-exports.__esModule = true;
-exports.BroadcastData = void 0;
-var BroadcastData = (function () {
-    function BroadcastData(sender, actions) {
-        this.actions = {};
-        this.sender = sender;
-        for (var i = 0, l = actions.length; i < l; i++) {
-            var action = actions[i];
-            if (typeof action === "string") {
-                this.actions[action] = null;
-            }
-            else {
-                this.actions = __assign(__assign({}, this.actions), action);
-            }
-        }
-    }
-    BroadcastData.prototype.hasAction = function () {
-        var classes = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i] = arguments[_i];
-        }
-        for (var i = 0, l = classes.length; i < l; i++) {
-            var a = classes[i];
-            if (this.actions[a] !== undefined) {
-                return true;
-            }
-        }
-        return false;
-    };
-    BroadcastData.prototype.getAction = function (action) {
-        return (this.actions[action] !== undefined) ? this.actions[action] : null;
-    };
-    return BroadcastData;
-}());
-exports.BroadcastData = BroadcastData;
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
 exports.__esModule = true;
 exports.rerender = exports.enqueueRender = exports.clearRender = void 0;
 var items = [];
@@ -1574,6 +1535,37 @@ function rerender() {
     }
 }
 exports.rerender = rerender;
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+exports.InternalEvent = void 0;
+var InternalEvent = (function () {
+    function InternalEvent() {
+    }
+    InternalEvent.Register = function (actionName, action) {
+        if (!InternalEvent.store[actionName]) {
+            InternalEvent.store[actionName] = [];
+        }
+        InternalEvent.store[actionName].push(action);
+    };
+    InternalEvent.Invoke = function (actionName, element, data) {
+        var actions = InternalEvent.store[actionName];
+        if (!actions) {
+            return;
+        }
+        for (var i = 0; i < actions.length; i++) {
+            actions[i](element, data);
+        }
+    };
+    return InternalEvent;
+}());
+exports.InternalEvent = InternalEvent;
 
 
 /***/ }),
@@ -1699,7 +1691,6 @@ var ListComponent = (function (_super) {
         return new ItemComponent_1.ItemComponent(props);
     };
     ListComponent.prototype.getRenderedChildren = function () {
-        console.log({ children: this.getChildren() });
         return {
             children: this.getChildren().map(function (c) { return c.getRenderedContent(); })
         };
@@ -1739,8 +1730,16 @@ var CheckBoxItemComponent = (function (_super) {
     function CheckBoxItemComponent(opts) {
         return _super.call(this, opts) || this;
     }
+    CheckBoxItemComponent.prototype.onMount = function () {
+        _super.prototype.onMount.call(this);
+        this.on("click", "onClick");
+    };
     CheckBoxItemComponent.prototype.getTemplate = function () {
         return "<span style=\"font-weight:bold\">{{description}}:</span>\n                <span>{{#value}}checked{{/value}}{{^value}}not{{/value}}</span>";
+    };
+    CheckBoxItemComponent.prototype.onClick = function () {
+        console.log('clicked');
+        this.updateStateProperties({ value: !this.state.value });
     };
     return CheckBoxItemComponent;
 }(ItemComponent_1.ItemComponent));

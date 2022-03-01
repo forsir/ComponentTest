@@ -21,6 +21,7 @@ export class CheckBoxItemComponent extends ItemComponent {
     }
 
     private onClick(): void {
+        console.log('clicked');
         this.updateStateProperties({ value: !this.state.value });
     }
 }

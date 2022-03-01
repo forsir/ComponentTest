@@ -22,8 +22,16 @@ var CheckBoxItemComponent = (function (_super) {
     function CheckBoxItemComponent(opts) {
         return _super.call(this, opts) || this;
     }
+    CheckBoxItemComponent.prototype.onMount = function () {
+        _super.prototype.onMount.call(this);
+        this.on("click", "onClick");
+    };
     CheckBoxItemComponent.prototype.getTemplate = function () {
         return "<span style=\"font-weight:bold\">{{description}}:</span>\n                <span>{{#value}}checked{{/value}}{{^value}}not{{/value}}</span>";
+    };
+    CheckBoxItemComponent.prototype.onClick = function () {
+        console.log('clicked');
+        this.updateStateProperties({ value: !this.state.value });
     };
     return CheckBoxItemComponent;
 }(ItemComponent_1.ItemComponent));
