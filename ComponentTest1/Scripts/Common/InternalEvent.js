@@ -19,6 +19,7 @@ var InternalEvent = (function () {
             actions[i](element, data);
         }
     };
+    InternalEvent.store = {};
     return InternalEvent;
 }());
 exports.InternalEvent = InternalEvent;

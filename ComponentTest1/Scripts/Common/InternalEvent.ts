@@ -1,7 +1,7 @@
 ﻿import { Component } from "../Component";
 
 export class InternalEvent {
-    private static store: { [key: string]: Function[] };
+    private static store: { [key: string]: Function[] } = {};
 
     public static Register(actionName: string, action: Function) {
         if (!InternalEvent.store[actionName]) {

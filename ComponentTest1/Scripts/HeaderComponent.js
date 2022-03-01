@@ -16,14 +16,22 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 exports.HeaderComponent = void 0;
+var InternalEvent_1 = require("./Common/InternalEvent");
 var Component_1 = require("./Component");
 var HeaderComponent = (function (_super) {
     __extends(HeaderComponent, _super);
     function HeaderComponent(opts) {
-        return _super.call(this, opts) || this;
+        var _this = _super.call(this, opts) || this;
+        _this.updateStateProperties({ count: 0 });
+        InternalEvent_1.InternalEvent.Register("checkbox-click", function () { return _this.clicked(); });
+        return _this;
     }
+    HeaderComponent.prototype.clicked = function () {
+        console.log("header clicked");
+        this.updateStateProperties({ count: this.state.count + 1 });
+    };
     HeaderComponent.prototype.getTemplate = function () {
-        return "<div style=\"border: 1px solid black\">{{title}}</div>";
+        return "<div style=\"border: 1px solid black\">{{title}} {{count}}</div>";
     };
     return HeaderComponent;
 }(Component_1.Component));

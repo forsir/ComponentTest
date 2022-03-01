@@ -15,6 +15,7 @@ exports.enqueueRender = enqueueRender;
 function rerender() {
     var component, list = items;
     items = [];
+    console.log("render", list);
     for (var i in list) {
         component = list[i];
         if (component.isDirty() && !component.getParent().isDirty()) {

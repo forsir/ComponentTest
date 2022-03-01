@@ -1,4 +1,5 @@
-﻿import { ItemComponent, ItemComponentProps } from "./ItemComponent";
+﻿import { InternalEvent } from "./Common/InternalEvent";
+import { ItemComponent, ItemComponentProps } from "./ItemComponent";
 
 export interface CheckBoxItemComponentProps extends ItemComponentProps {
     description: string,
@@ -22,6 +23,7 @@ export class CheckBoxItemComponent extends ItemComponent {
 
     private onClick(): void {
         console.log('clicked');
+        this.broadcast("checkbox-click", null);
         this.updateStateProperties({ value: !this.state.value });
     }
 }

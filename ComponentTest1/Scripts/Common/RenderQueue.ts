@@ -16,6 +16,8 @@ export function rerender() {
     let component, list = items;
     items = [];
 
+    console.log("render", list);
+
     for (let i in list) {
         component = list[i];
         if (component.isDirty() && !component.getParent().isDirty()) {

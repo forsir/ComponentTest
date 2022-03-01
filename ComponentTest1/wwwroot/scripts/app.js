@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -103,10 +103,10 @@ var __assign = (this && this.__assign) || function () {
 };
 exports.__esModule = true;
 exports.Component = exports.EvtSource = void 0;
-var EventsListener_1 = __webpack_require__(6);
-var RenderQueue_1 = __webpack_require__(8);
+var EventsListener_1 = __webpack_require__(7);
+var RenderQueue_1 = __webpack_require__(9);
 var mustache_1 = __webpack_require__(2);
-var InternalEvent_1 = __webpack_require__(9);
+var InternalEvent_1 = __webpack_require__(3);
 var __uid = 0;
 var EvtSource = (function () {
     function EvtSource() {
@@ -1222,8 +1222,40 @@ exports.ItemComponent = ItemComponent;
 "use strict";
 
 exports.__esModule = true;
-var Dictionary_1 = __webpack_require__(4);
-var RootComponent_1 = __webpack_require__(5);
+exports.InternalEvent = void 0;
+var InternalEvent = (function () {
+    function InternalEvent() {
+    }
+    InternalEvent.Register = function (actionName, action) {
+        if (!InternalEvent.store[actionName]) {
+            InternalEvent.store[actionName] = [];
+        }
+        InternalEvent.store[actionName].push(action);
+    };
+    InternalEvent.Invoke = function (actionName, element, data) {
+        var actions = InternalEvent.store[actionName];
+        if (!actions) {
+            return;
+        }
+        for (var i = 0; i < actions.length; i++) {
+            actions[i](element, data);
+        }
+    };
+    InternalEvent.store = {};
+    return InternalEvent;
+}());
+exports.InternalEvent = InternalEvent;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var Dictionary_1 = __webpack_require__(5);
+var RootComponent_1 = __webpack_require__(6);
 window.addEventListener('load', function (event) {
     console.log("app start");
     Dictionary_1.Dictionary.setVocabulary(window.vocabulary || {});
@@ -1235,7 +1267,7 @@ window.addEventListener('load', function (event) {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1265,7 +1297,7 @@ exports.Dictionary = Dictionary;
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1328,14 +1360,14 @@ exports.RootComponent = RootComponent;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
 exports.EventsListener = void 0;
-var Logger_1 = __webpack_require__(7);
+var Logger_1 = __webpack_require__(8);
 var EventsListener = (function () {
     function EventsListener(listener) {
         this.events = {};
@@ -1405,7 +1437,7 @@ exports.EventsListener = EventsListener;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1506,7 +1538,7 @@ exports.Logger = Logger;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1527,6 +1559,7 @@ exports.enqueueRender = enqueueRender;
 function rerender() {
     var component, list = items;
     items = [];
+    console.log("render", list);
     for (var i in list) {
         component = list[i];
         if (component.isDirty() && !component.getParent().isDirty()) {
@@ -1535,37 +1568,6 @@ function rerender() {
     }
 }
 exports.rerender = rerender;
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-exports.InternalEvent = void 0;
-var InternalEvent = (function () {
-    function InternalEvent() {
-    }
-    InternalEvent.Register = function (actionName, action) {
-        if (!InternalEvent.store[actionName]) {
-            InternalEvent.store[actionName] = [];
-        }
-        InternalEvent.store[actionName].push(action);
-    };
-    InternalEvent.Invoke = function (actionName, element, data) {
-        var actions = InternalEvent.store[actionName];
-        if (!actions) {
-            return;
-        }
-        for (var i = 0; i < actions.length; i++) {
-            actions[i](element, data);
-        }
-    };
-    return InternalEvent;
-}());
-exports.InternalEvent = InternalEvent;
 
 
 /***/ }),
@@ -1629,14 +1631,22 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 exports.HeaderComponent = void 0;
+var InternalEvent_1 = __webpack_require__(3);
 var Component_1 = __webpack_require__(0);
 var HeaderComponent = (function (_super) {
     __extends(HeaderComponent, _super);
     function HeaderComponent(opts) {
-        return _super.call(this, opts) || this;
+        var _this = _super.call(this, opts) || this;
+        _this.updateStateProperties({ count: 0 });
+        InternalEvent_1.InternalEvent.Register("checkbox-click", function () { return _this.clicked(); });
+        return _this;
     }
+    HeaderComponent.prototype.clicked = function () {
+        console.log("header clicked");
+        this.updateStateProperties({ count: this.state.count + 1 });
+    };
     HeaderComponent.prototype.getTemplate = function () {
-        return "<div style=\"border: 1px solid black\">{{title}}</div>";
+        return "<div style=\"border: 1px solid black\">{{title}} {{count}}</div>";
     };
     return HeaderComponent;
 }(Component_1.Component));
@@ -1739,6 +1749,7 @@ var CheckBoxItemComponent = (function (_super) {
     };
     CheckBoxItemComponent.prototype.onClick = function () {
         console.log('clicked');
+        this.broadcast("checkbox-click", null);
         this.updateStateProperties({ value: !this.state.value });
     };
     return CheckBoxItemComponent;

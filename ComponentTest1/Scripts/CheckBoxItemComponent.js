@@ -31,6 +31,7 @@ var CheckBoxItemComponent = (function (_super) {
     };
     CheckBoxItemComponent.prototype.onClick = function () {
         console.log('clicked');
+        this.broadcast("checkbox-click", null);
         this.updateStateProperties({ value: !this.state.value });
     };
     return CheckBoxItemComponent;
