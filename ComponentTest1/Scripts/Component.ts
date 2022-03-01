@@ -1,8 +1,6 @@
 import { EventsListener } from "./Common/EventsListener";
-import { BroadcastData } from "./Common/BroadcastData";
 import { enqueueRender } from "./Common/RenderQueue";
 import { render } from 'mustache';
-import { RootComponent } from "./RootComponent";
 import { InternalEvent } from "./Common/InternalEvent";
 
 let __uid = 0;
@@ -11,43 +9,6 @@ export interface EventListener {
     on(event: string, listener: any): any;
 
     off(event: string): any;
-}
-
-export class EvtSource {
-    private evtSource: EventSource;
-    private listeners: { [index: string]: any } = {};
-
-    public open(url: string): void {
-        if (this.evtSource) {
-            this.remove();
-        }
-
-        this.evtSource = new EventSource(url);
-    }
-
-    public addListener(type: string, callback: (evt: Event) => void, options: boolean | AddEventListenerOptions): void {
-        this.evtSource.addEventListener(type, callback, options);
-        this.listeners[type] = callback;
-    }
-
-    public close(): void {
-        if (!this.evtSource) return;
-        this.evtSource.close();
-    }
-
-    public remove(): void {
-        if (!this.evtSource) return;
-        Object.keys(this.listeners).forEach((key) => {
-            this.evtSource.removeEventListener(key, this.listeners[key]);
-        });
-        this.listeners = {}
-        this.evtSource.close();
-        this.evtSource = null;
-    }
-
-    public onError(callback: any): void {
-        this.evtSource.onerror = callback;
-    }
 }
 
 export interface ComponentInterface {
@@ -85,7 +46,7 @@ export interface ComponentInterface {
 
     deleteAllChildren(): void;
 
-    getChildren(): ComponentInterface[]; //{ [id: string]: ComponentInterface };
+    getChildren(): ComponentInterface[];
 
     findChild(id: string): ComponentInterface;
 
@@ -111,8 +72,6 @@ export abstract class Component implements ComponentInterface, EventListener {
     private $element: HTMLElement;
     private _isDirty: boolean = true;
     private _eventResolver: EventsListener;
-
-    protected eventSrc: EvtSource = new EvtSource();
 
     constructor(props: ComponentProps = {}) {
         if (props.state) {
@@ -145,7 +104,7 @@ export abstract class Component implements ComponentInterface, EventListener {
 
         let id = this.getId();
 
-        console.log("mount", id);
+        console.log("mounting", id);
 
         if (!$element) {
             $element = document.getElementById(id);
@@ -186,7 +145,6 @@ export abstract class Component implements ComponentInterface, EventListener {
             return;
         }
 
-        //this.eventSrc.remove();
         this._eventResolver.remove();
         for (let key in this.children) {
             let child = this.children[key];
@@ -296,14 +254,11 @@ export abstract class Component implements ComponentInterface, EventListener {
         return null;
     }
 
-    public onBroadcast(ed: BroadcastData) { /* abstract */
-    }
-
     public broadcast(actionType: string, data: any) {
         InternalEvent.Invoke(actionType, this, data);
     }
 
-    public broadcastregister(actionType: string, action: Function) {
+    public registerBroadcast(actionType: string, action: Function) {
         InternalEvent.Register(actionType, action);
     }
 
@@ -366,39 +321,7 @@ export abstract class Component implements ComponentInterface, EventListener {
         this.onAfterUpdate();
     }
 
-    show(): void {
-        this.getElement().style.display = "block";
-    }
-
-    hide(): void {
-        this.getElement().style.display = "none";
-    }
-
-    isShown(): boolean {
-        return this.getElement().style.display == "block";
-    }
-
-    addClassName(className: string): void {
-        if (this.hasClassName(className)) {
-            return;
-        }
-
-        this.getElement().className += ' ' + className;
-    }
-
-    removeClassName(className: string): void {
-        let $el = this.getElement();
-        $el.className = $el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
-    }
-
-    hasClassName(className: string): boolean {
-        return new RegExp('(^| )' + className + '( |$)', 'gi').test(this.getElement().className);
-    }
-
-    public getRoute(): string {
-        return location.hash.replace('#/', '');
-    }
-
+    // To override
     public getRenderedChildren(): { [key: string]: any } {
         return {};
     }

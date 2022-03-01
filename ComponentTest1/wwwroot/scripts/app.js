@@ -105,8 +105,8 @@ exports.__esModule = true;
 exports.Component = exports.EvtSource = void 0;
 var EventsListener_1 = __webpack_require__(7);
 var RenderQueue_1 = __webpack_require__(9);
-var mustache_1 = __webpack_require__(2);
-var InternalEvent_1 = __webpack_require__(3);
+var mustache_1 = __webpack_require__(3);
+var InternalEvent_1 = __webpack_require__(2);
 var __uid = 0;
 var EvtSource = (function () {
     function EvtSource() {
@@ -440,6 +440,38 @@ exports.ItemComponent = ItemComponent;
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+exports.InternalEvent = void 0;
+var InternalEvent = (function () {
+    function InternalEvent() {
+    }
+    InternalEvent.Register = function (actionName, action) {
+        if (!InternalEvent.store[actionName]) {
+            InternalEvent.store[actionName] = [];
+        }
+        InternalEvent.store[actionName].push(action);
+    };
+    InternalEvent.Invoke = function (actionName, element, data) {
+        var actions = InternalEvent.store[actionName];
+        if (!actions) {
+            return;
+        }
+        for (var i = 0; i < actions.length; i++) {
+            actions[i](element, data);
+        }
+    };
+    InternalEvent.store = {};
+    return InternalEvent;
+}());
+exports.InternalEvent = InternalEvent;
+
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function (global, factory) {
@@ -1216,38 +1248,6 @@ exports.ItemComponent = ItemComponent;
 
 
 /***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-exports.InternalEvent = void 0;
-var InternalEvent = (function () {
-    function InternalEvent() {
-    }
-    InternalEvent.Register = function (actionName, action) {
-        if (!InternalEvent.store[actionName]) {
-            InternalEvent.store[actionName] = [];
-        }
-        InternalEvent.store[actionName].push(action);
-    };
-    InternalEvent.Invoke = function (actionName, element, data) {
-        var actions = InternalEvent.store[actionName];
-        if (!actions) {
-            return;
-        }
-        for (var i = 0; i < actions.length; i++) {
-            actions[i](element, data);
-        }
-    };
-    InternalEvent.store = {};
-    return InternalEvent;
-}());
-exports.InternalEvent = InternalEvent;
-
-
-/***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1328,7 +1328,7 @@ var __assign = (this && this.__assign) || function () {
 };
 exports.__esModule = true;
 exports.RootComponent = void 0;
-var mustache_1 = __webpack_require__(2);
+var mustache_1 = __webpack_require__(3);
 var Component_1 = __webpack_require__(0);
 var PageComponent_1 = __webpack_require__(10);
 var RootComponent = (function (_super) {
@@ -1591,6 +1591,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 exports.PageComponent = void 0;
+var InternalEvent_1 = __webpack_require__(2);
 var Component_1 = __webpack_require__(0);
 var HeaderComponent_1 = __webpack_require__(11);
 var ListComponent_1 = __webpack_require__(12);
@@ -1600,10 +1601,20 @@ var PageComponent = (function (_super) {
         var _this = _super.call(this, opts) || this;
         _this.addChild('header', new HeaderComponent_1.HeaderComponent(opts.header));
         _this.addChild('list', new ListComponent_1.ListComponent(opts.list));
+        InternalEvent_1.InternalEvent.Register("header-click", function () { return _this.clicked(); });
+        _this.updateStateProperties({ showList: true });
         return _this;
     }
+    PageComponent.prototype.clicked = function () {
+        this.updateStateProperties({ showList: !this.state.showList });
+    };
     PageComponent.prototype.getTemplate = function () {
-        return "<div>{{>header}}</div>\n                <div>{{>list}}</div>";
+        if (this.state.showList) {
+            return "<div>{{>header}}</div>\n                <div>{{>list}}</div>";
+        }
+        else {
+            return "<div>{{>header}}</div>";
+        }
     };
     return PageComponent;
 }(Component_1.Component));
@@ -1631,7 +1642,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 exports.HeaderComponent = void 0;
-var InternalEvent_1 = __webpack_require__(3);
+var InternalEvent_1 = __webpack_require__(2);
 var Component_1 = __webpack_require__(0);
 var HeaderComponent = (function (_super) {
     __extends(HeaderComponent, _super);
@@ -1641,6 +1652,13 @@ var HeaderComponent = (function (_super) {
         InternalEvent_1.InternalEvent.Register("checkbox-click", function () { return _this.clicked(); });
         return _this;
     }
+    HeaderComponent.prototype.onMount = function () {
+        _super.prototype.onMount.call(this);
+        this.on("click", "onClick");
+    };
+    HeaderComponent.prototype.onClick = function () {
+        this.broadcast("header-click", null);
+    };
     HeaderComponent.prototype.clicked = function () {
         console.log("header clicked");
         this.updateStateProperties({ count: this.state.count + 1 });

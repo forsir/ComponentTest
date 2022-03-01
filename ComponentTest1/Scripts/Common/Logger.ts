@@ -43,28 +43,4 @@ export class Logger {
                 console.log(msg, ...optionalParams);
         }
     }
-
-    private static stringifyParam(param: any): string {
-        let text: string;
-
-        alert("2");
-        if (param instanceof HTMLElement) {
-            let tagName = param.localName.toLowerCase();
-            text = " &lt;" + tagName
-                + (param.id ? " id=\"" + param.id + "\"" : "")
-                + (param.getAttribute('data-is') ? " data-is=\"" + param.getAttribute('data-is') + "\"" : "")
-                + "&gt;";
-        }
-        else if (param === null) {
-            text = "NULL";
-        }
-        else if (param instanceof Object) {
-            text = "<i>" + param.toString() + "</i>";
-        }
-        else {
-            text = " " + param.toString();
-        }
-
-        return " | " + text;
-    }
 }

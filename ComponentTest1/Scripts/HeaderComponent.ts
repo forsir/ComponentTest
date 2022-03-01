@@ -13,6 +13,15 @@ export class HeaderComponent extends Component {
         InternalEvent.Register("checkbox-click", () => this.clicked())
     }
 
+    protected onMount(): void {
+        super.onMount();
+        this.on("click", "onClick");
+    }
+
+    public onClick() {
+        this.broadcast("header-click", null);
+    }
+
     public clicked() {
         console.log("header clicked");
         this.updateStateProperties({ count: this.state.count + 1 });

@@ -1,4 +1,5 @@
-﻿import { Component, ComponentProps } from "./Component";
+﻿import { InternalEvent } from "./Common/InternalEvent";
+import { Component, ComponentProps } from "./Component";
 import { HeaderComponent, HeaderComponentProps } from "./HeaderComponent";
 import { ListComponent, ListComponentProps } from "./ListComponent";
 
@@ -14,10 +15,22 @@ export class PageComponent extends Component {
         super(opts);
         this.addChild('header', new HeaderComponent(opts.header));
         this.addChild('list', new ListComponent(opts.list));
+
+        InternalEvent.Register("header-click", () => this.clicked())
+
+        this.updateStateProperties({ showList: true });
+    }
+
+    public clicked() {
+        this.updateStateProperties({ showList: !this.state.showList });
     }
 
     public getTemplate(): string {
-        return `<div>{{>header}}</div>
+        if (this.state.showList) {
+            return `<div>{{>header}}</div>
                 <div>{{>list}}</div>`;
+        } else {
+            return `<div>{{>header}}</div>`;
+        }
     }
 }

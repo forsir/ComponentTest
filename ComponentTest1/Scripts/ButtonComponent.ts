@@ -30,21 +30,6 @@ export class ButtonComponent extends Component {
         }
     }
 
-    protected onAfterRender() {
-        super.onAfterRender();
-        this.addClassName("btn");
-        if (this.props.disabled) {
-            this.addClassName("disabled");
-        } else {
-            this.removeClassName("disabled");
-        }
-        if (this.props.hidden) {
-            this.addClassName("hidden");
-        } else {
-            this.removeClassName("hidden");
-        }
-    }
-
     // TODO finish it
     protected onClick() {
         if (!this.props.disabled) {

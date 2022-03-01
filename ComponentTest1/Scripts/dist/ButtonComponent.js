@@ -38,22 +38,6 @@ var ButtonComponent = (function (_super) {
             this.props.hidden = false;
         }
     };
-    ButtonComponent.prototype.onAfterRender = function () {
-        _super.prototype.onAfterRender.call(this);
-        this.addClassName("btn");
-        if (this.props.disabled) {
-            this.addClassName("disabled");
-        }
-        else {
-            this.removeClassName("disabled");
-        }
-        if (this.props.hidden) {
-            this.addClassName("hidden");
-        }
-        else {
-            this.removeClassName("hidden");
-        }
-    };
     ButtonComponent.prototype.onClick = function () {
         if (!this.props.disabled) {
             this.broadcast(this.props.command, this.props.command);

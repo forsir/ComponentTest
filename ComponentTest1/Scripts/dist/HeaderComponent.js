@@ -26,6 +26,13 @@ var HeaderComponent = (function (_super) {
         InternalEvent_1.InternalEvent.Register("checkbox-click", function () { return _this.clicked(); });
         return _this;
     }
+    HeaderComponent.prototype.onMount = function () {
+        _super.prototype.onMount.call(this);
+        this.on("click", "onClick");
+    };
+    HeaderComponent.prototype.onClick = function () {
+        this.broadcast("header-click", null);
+    };
     HeaderComponent.prototype.clicked = function () {
         console.log("header clicked");
         this.updateStateProperties({ count: this.state.count + 1 });

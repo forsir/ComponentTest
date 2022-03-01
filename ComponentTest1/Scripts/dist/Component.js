@@ -11,55 +11,18 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 exports.__esModule = true;
-exports.Component = exports.EvtSource = void 0;
+exports.Component = void 0;
 var EventsListener_1 = require("./Common/EventsListener");
 var RenderQueue_1 = require("./Common/RenderQueue");
 var mustache_1 = require("mustache");
 var InternalEvent_1 = require("./Common/InternalEvent");
 var __uid = 0;
-var EvtSource = (function () {
-    function EvtSource() {
-        this.listeners = {};
-    }
-    EvtSource.prototype.open = function (url) {
-        if (this.evtSource) {
-            this.remove();
-        }
-        this.evtSource = new EventSource(url);
-    };
-    EvtSource.prototype.addListener = function (type, callback, options) {
-        this.evtSource.addEventListener(type, callback, options);
-        this.listeners[type] = callback;
-    };
-    EvtSource.prototype.close = function () {
-        if (!this.evtSource)
-            return;
-        this.evtSource.close();
-    };
-    EvtSource.prototype.remove = function () {
-        var _this = this;
-        if (!this.evtSource)
-            return;
-        Object.keys(this.listeners).forEach(function (key) {
-            _this.evtSource.removeEventListener(key, _this.listeners[key]);
-        });
-        this.listeners = {};
-        this.evtSource.close();
-        this.evtSource = null;
-    };
-    EvtSource.prototype.onError = function (callback) {
-        this.evtSource.onerror = callback;
-    };
-    return EvtSource;
-}());
-exports.EvtSource = EvtSource;
 var Component = (function () {
     function Component(props) {
         if (props === void 0) { props = {}; }
         this.children = {};
         this.state = {};
         this._isDirty = true;
-        this.eventSrc = new EvtSource();
         if (props.state) {
             this.setState(props.state);
         }
@@ -81,7 +44,7 @@ var Component = (function () {
     Component.prototype.mount = function ($element) {
         this.onBeforeMount($element);
         var id = this.getId();
-        console.log("mount", id);
+        console.log("mounting", id);
         if (!$element) {
             $element = document.getElementById(id);
             if (!$element) {
@@ -204,12 +167,10 @@ var Component = (function () {
     Component.prototype.getTemplate = function () {
         return null;
     };
-    Component.prototype.onBroadcast = function (ed) {
-    };
     Component.prototype.broadcast = function (actionType, data) {
         InternalEvent_1.InternalEvent.Invoke(actionType, this, data);
     };
-    Component.prototype.broadcastregister = function (actionType, action) {
+    Component.prototype.registerBroadcast = function (actionType, action) {
         InternalEvent_1.InternalEvent.Register(actionType, action);
     };
     Component.prototype.onCreated = function () {
@@ -248,31 +209,6 @@ var Component = (function () {
         this.onBeforeUpdate();
         this.state = __assign({}, state);
         this.onAfterUpdate();
-    };
-    Component.prototype.show = function () {
-        this.getElement().style.display = "block";
-    };
-    Component.prototype.hide = function () {
-        this.getElement().style.display = "none";
-    };
-    Component.prototype.isShown = function () {
-        return this.getElement().style.display == "block";
-    };
-    Component.prototype.addClassName = function (className) {
-        if (this.hasClassName(className)) {
-            return;
-        }
-        this.getElement().className += ' ' + className;
-    };
-    Component.prototype.removeClassName = function (className) {
-        var $el = this.getElement();
-        $el.className = $el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
-    };
-    Component.prototype.hasClassName = function (className) {
-        return new RegExp('(^| )' + className + '( |$)', 'gi').test(this.getElement().className);
-    };
-    Component.prototype.getRoute = function () {
-        return location.hash.replace('#/', '');
     };
     Component.prototype.getRenderedChildren = function () {
         return {};

@@ -16,6 +16,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 exports.PageComponent = void 0;
+var InternalEvent_1 = require("./Common/InternalEvent");
 var Component_1 = require("./Component");
 var HeaderComponent_1 = require("./HeaderComponent");
 var ListComponent_1 = require("./ListComponent");
@@ -25,10 +26,20 @@ var PageComponent = (function (_super) {
         var _this = _super.call(this, opts) || this;
         _this.addChild('header', new HeaderComponent_1.HeaderComponent(opts.header));
         _this.addChild('list', new ListComponent_1.ListComponent(opts.list));
+        InternalEvent_1.InternalEvent.Register("header-click", function () { return _this.clicked(); });
+        _this.updateStateProperties({ showList: true });
         return _this;
     }
+    PageComponent.prototype.clicked = function () {
+        this.updateStateProperties({ showList: !this.state.showList });
+    };
     PageComponent.prototype.getTemplate = function () {
-        return "<div>{{>header}}</div>\n                <div>{{>list}}</div>";
+        if (this.state.showList) {
+            return "<div>{{>header}}</div>\n                <div>{{>list}}</div>";
+        }
+        else {
+            return "<div>{{>header}}</div>";
+        }
     };
     return PageComponent;
 }(Component_1.Component));

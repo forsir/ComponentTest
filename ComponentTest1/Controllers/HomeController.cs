@@ -15,13 +15,13 @@ namespace ComponentTest1.Controllers
 
         public IActionResult Index()
         {
-            Page data = new("Zkušební stránka",
+            Page data = new("Test page",
                 new List<Item>
                 {
-                    new TextItem("Textová položka", "cokoliv"),
-                    new CheckBoxItem( "Bool položka", true),
-                    new DatasetItem("Seznam", "Jedna",
-                    new List<string>{ "Jedna", "Dva", "Tři" })
+                    new TextItem("Text item", "anything"),
+                    new CheckBoxItem( "Bool item", true),
+                    new DatasetItem("List", "One",
+                    new List<string>{ "One", "Two", "Three" })
                 });
 
             //        Page data = new("Zkušební stránka",

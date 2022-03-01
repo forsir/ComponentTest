@@ -10,13 +10,13 @@ var InternalEvent = (function () {
         }
         InternalEvent.store[actionName].push(action);
     };
-    InternalEvent.Invoke = function (actionName, element, data) {
+    InternalEvent.Invoke = function (actionName, component, data) {
         var actions = InternalEvent.store[actionName];
         if (!actions) {
             return;
         }
         for (var i = 0; i < actions.length; i++) {
-            actions[i](element, data);
+            actions[i](component, data);
         }
     };
     InternalEvent.store = {};

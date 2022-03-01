@@ -50,8 +50,6 @@ export class EventsListener implements EventListenerObject {
         }
 
         if (e instanceof MutationEvent) {
-            //console.debug(eventType, e.relatedNode, this.listener.getElement());
-
             if (e.relatedNode !== this.listener.getElement()) {
                 return;
             }
@@ -65,8 +63,8 @@ export class EventsListener implements EventListenerObject {
             return listener;
         } else if (typeof listener === 'string' && typeof this.listener[listener] === 'function') {
             return listener;
-            //} else if (typeof this.listener['on' + event.ucFirst()] === 'function') {
-            //    return 'on' + event.ucFirst();
+        } else if (typeof this.listener['on' + this.ucFirst(event)] === 'function') {
+            return 'on' + this.ucFirst(event);
         } else if (typeof this.listener['on' + event.toLowerCase()] === 'function') {
             return 'on' + event.toLowerCase();
         } else if (typeof this.listener['on' + event] === 'function') {
@@ -74,6 +72,10 @@ export class EventsListener implements EventListenerObject {
         }
 
         return undefined;
+    }
+
+    private ucFirst(text: string) {
+        return text.charAt(0).toUpperCase() + text.slice(1);
     }
 
     private callListener(eventType: string, event: Event) {

@@ -48,6 +48,9 @@ var EventsListener = (function () {
         else if (typeof listener === 'string' && typeof this.listener[listener] === 'function') {
             return listener;
         }
+        else if (typeof this.listener['on' + this.ucFirst(event)] === 'function') {
+            return 'on' + this.ucFirst(event);
+        }
         else if (typeof this.listener['on' + event.toLowerCase()] === 'function') {
             return 'on' + event.toLowerCase();
         }
@@ -55,6 +58,9 @@ var EventsListener = (function () {
             return 'on' + event;
         }
         return undefined;
+    };
+    EventsListener.prototype.ucFirst = function (text) {
+        return text.charAt(0).toUpperCase() + text.slice(1);
     };
     EventsListener.prototype.callListener = function (eventType, event) {
         var listener = this.events[eventType];
